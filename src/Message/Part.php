@@ -319,6 +319,24 @@ class Part implements \RecursiveIterator
      *
      * @return string
      */
+    public function getRawHeader($keepUnseen = false) {
+        return imap_fetchbody(
+            $this->stream,
+            $this->messageNumber,
+            "$this->partNumber.0",
+            \FT_UID | ($keepUnseen ? \FT_PEEK : null)
+        );
+    }
+
+    /**
+     * Get raw message content
+     *
+     * @param bool $keepUnseen Whether to keep the message unseen.
+     *                         Default behaviour is set set the seen flag when
+     *                         getting content.
+     *
+     * @return string
+     */
     protected function doGetContent($keepUnseen = false)
     {
         return imap_fetchbody(
@@ -366,7 +384,7 @@ class Part implements \RecursiveIterator
 
     public function debugParts($pref = '')
     {
-        $res = sprintf("%s%s %s/%s\n",$pref,get_class($this),$this->getType(),$this->getSubType());
+        $res = sprintf("%s%s %s/%s %s\n",$pref,get_class($this),$this->getType(),$this->getSubType(), $this->partNumber);
         $pref .= '    ';
 
         foreach($this->parts as $part){
